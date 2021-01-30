@@ -1,0 +1,37 @@
+{
+  "RelicFilterMod:ModPanel": {
+    "TEXT": [
+      "Relics Filter",
+      "280chan",
+      "Filter out relics you don't like from pool."
+    ]
+  },
+  "RelicFilterMod:RelicSelectScreen": {
+    "TEXT": [
+      "Save"
+    ]
+  },
+  "RelicFilterMod:RelicFilterSelectScreen": {
+    "TEXT": [
+      "Filtered",
+      "Boss",
+      "Common",
+      "Deprecated",
+      "Rare",
+      "Shop",
+      "Event",
+      "Starter",
+      "Uncommon",
+      "Other",
+      "Relics found only within Boss chests.",
+      "Weak relics that are found commonly.",
+      "Unique and powerful relics which are rarely seen.",
+      "Relics which can only be purchased from the Merchant.",
+      "Relics which can only be obtained through events.",
+      "Characters can start with these relics.",
+      "Stronger relics which appear less often than common relics.",
+      "Relics you filtered.",
+      "Relics that are uncategorized, or belong to rarity from mods."
+    ]
+  }
+}

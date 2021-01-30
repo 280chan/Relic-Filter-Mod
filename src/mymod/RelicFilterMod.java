@@ -1,40 +1,49 @@
 package mymod;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.evacipated.cardcrawl.modthespire.lib.SpireConfig;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInitializer;
+import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
-import com.megacrit.cardcrawl.core.Settings.GameLanguage;
 import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
+import com.megacrit.cardcrawl.localization.UIStrings;
+
 import basemod.BaseMod;
 import basemod.ModLabeledButton;
 import basemod.ModPanel;
+import basemod.interfaces.EditStringsSubscriber;
 import basemod.interfaces.PostDungeonInitializeSubscriber;
 import basemod.interfaces.PostInitializeSubscriber;
 
 /**
  * @author 彼君不触
- * @version 1/22/2021
+ * @version 1/29/2021
  * @since 1/22/2021
  */
 
 @SpireInitializer
-public class RelicFilterMod implements PostInitializeSubscriber, PostDungeonInitializeSubscriber {
-	public static final Logger LOGGER = LogManager.getLogger(RelicFilterMod.class.getName());
+public class RelicFilterMod implements PostInitializeSubscriber, PostDungeonInitializeSubscriber, EditStringsSubscriber {
+	public static final String MOD_ID = "RelicFilterMod";
 	public static Properties configDefault = new Properties();
 	public static SpireConfig config;
 	public static ArrayList<String> RELICS;
 	private ModPanel settingsPanel;
+	private static final String UIID = "ModPanel";
+	private static UIStrings strings;
+	private static String[] text;
+	
+	public static String makeID(String id) {
+		return MOD_ID + ":" + id;
+	}
 	
 	public static void loadConfigData() {
 		try {
-			config = new SpireConfig("RelicFilterMod", "RelicFilterSaveData", configDefault);
+			config = new SpireConfig(MOD_ID, "RelicFilterSaveData", configDefault);
 			config.load();
 		} catch (Exception var1) {
 			var1.printStackTrace();
@@ -50,10 +59,44 @@ public class RelicFilterMod implements PostInitializeSubscriber, PostDungeonInit
 		}
 	}
 	
+	private static String lanFix(String type) {
+		String lan = "eng";
+		switch(Settings.language) {
+		case ZHS:
+		case ENG:
+			lan = Settings.language.toString().toLowerCase();
+		default:
+			break;
+		}
+		return type + "_" + lan + ".json";
+	}
+	
+	private static String pathFix(String lan) {
+		return "localizations/" + lan;
+	}
+	
+	private static String readString(String type) {
+		return Gdx.files.internal(pathFix(lanFix(type))).readString(String.valueOf(StandardCharsets.UTF_8));
+	}
+	
+	@Override
+	public void receiveEditStrings() {
+		BaseMod.loadCustomStrings(UIStrings.class, readString("ui"));
+	}
+	
 	public static void initialize() {
 		BaseMod.subscribe(new RelicFilterMod());
 	}
 
+	public static UIStrings getStrings(String id) {
+		return CardCrawlGame.languagePack.getUIString(makeID(id));
+	}
+	
+	private static void initModPanelString() {
+		strings = getStrings(UIID);
+		text = strings.TEXT;
+	}
+	
 	@Override
 	public void receivePostInitialize() {
 		RelicSelectScreen.initialize();
@@ -62,30 +105,18 @@ public class RelicFilterMod implements PostInitializeSubscriber, PostDungeonInit
 			configDefault.setProperty(id, "FALSE");
 		}
 		loadConfigData();
+		initModPanelString();
 		this.initializeModPanel();
 	}
 	
 	private void initializeModPanel() {
 		Texture badgeTexture = new Texture("images/badge.png");
 		this.settingsPanel = new ModPanel();
-		ModLabeledButton filterRelics;
-		if (Settings.language == GameLanguage.ZHS) {
-			filterRelics = new ModLabeledButton("筛选遗物", 350.0F, 300.0F, this.settingsPanel, (button) -> {
-				new RelicFilterSelectScreen().open();
-			});
-		} else {
-			filterRelics = new ModLabeledButton("Relics Filter", 350.0F, 300.0F, this.settingsPanel, (button) -> {
-				new RelicFilterSelectScreen().open();
-			});
-		}
+		ModLabeledButton filterRelics = new ModLabeledButton(text[0], 350.0F, 300.0F, this.settingsPanel, (button) -> {
+			new RelicFilterSelectScreen().open();
+		});
 		this.settingsPanel.addUIElement(filterRelics);
-		if (Settings.language == GameLanguage.ZHS) {
-			BaseMod.registerModBadge(badgeTexture, "RelicFilterMod", "彼君不触",
-					"将任意遗物从遗物池中筛选出去。", this.settingsPanel);
-		} else {
-			BaseMod.registerModBadge(badgeTexture, "RelicFilterMod", "280chan",
-					"Filter out relics you don't like from pool.", this.settingsPanel);
-		}
+		BaseMod.registerModBadge(badgeTexture, MOD_ID, text[1], text[2], this.settingsPanel);
 	}
 
 	public static void removeFromPool(String id) {
@@ -104,6 +135,5 @@ public class RelicFilterMod implements PostInitializeSubscriber, PostDungeonInit
 			}
 		}
 	}
-	
 
 }

@@ -1,11 +1,13 @@
 package mymod;
 
-import com.megacrit.cardcrawl.core.Settings;
-import com.megacrit.cardcrawl.core.Settings.GameLanguage;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 
 public class RelicFilterSelectScreen extends RelicSelectScreen {
+	private static final String UIID = "RelicFilterSelectScreen";
+	private static final UIStrings strings = RelicFilterMod.getStrings(UIID);
+	private static final String[] TEXT = strings.TEXT;
 	
 	public RelicFilterSelectScreen() {
 		super(true, true, true);
@@ -31,93 +33,58 @@ public class RelicFilterSelectScreen extends RelicSelectScreen {
 
 	@Override
 	protected String categoryOf(AbstractRelic r) {
-		if (Settings.language == GameLanguage.ZHS) {
-			if (RelicFilterMod.config.getBool(r.relicId))
-				return "筛除";
-			switch(r.tier) {
-			case BOSS:
-				return "Boss";
-			case COMMON:
-				return "普通";
-			case DEPRECATED:
-				return "废弃";
-			case RARE:
-				return "稀有";
-			case SHOP:
-				return "商店";
-			case SPECIAL:
-				return "事件";
-			case STARTER:
-				return "初始";
-			case UNCOMMON:
-				return "罕见";
-			}
-			return "其他";
-		}
 		if (RelicFilterMod.config.getBool(r.relicId))
-			return "Filtered";
+			return TEXT[0];
 		switch(r.tier) {
 		case BOSS:
-			return "Boss";
+			return TEXT[1];
 		case COMMON:
-			return "Common";
+			return TEXT[2];
 		case DEPRECATED:
-			return "Deprecated";
+			return TEXT[3];
 		case RARE:
-			return "Rare";
+			return TEXT[4];
 		case SHOP:
-			return "Shop";
+			return TEXT[5];
 		case SPECIAL:
-			return "Event";
+			return TEXT[6];
 		case STARTER:
-			return "Starter";
+			return TEXT[7];
 		case UNCOMMON:
-			return "Uncommon";
+			return TEXT[8];
 		}
-		return "Other";
+		return TEXT[9];
 	}
 
 	@Override
 	protected String descriptionOfCategory(String category) {
-		if (Settings.language == GameLanguage.ZHS) {
-			switch (category) {
-			case "Boss":
-				return "只在Boss宝箱中出现的遗物。";
-			case "普通":
-				return "很容易找到的弱小遗物。";
-			case "稀有":
-				return "极为少见的独特且强大的遗物。";
-			case "商店":
-				return "只能从商人处购买到的遗物。";
-			case "事件":
-				return "只能通过事件获得的遗物。";
-			case "初始":
-				return "角色初始携带的遗物。";
-			case "罕见":
-				return "比普通遗物更强大也更少见的遗物。";
-			case "筛除":
-				return "已被移除遗物池的遗物。";
+		int index = 0;
+		for (int i = 0; i < 10; i++) {
+			if (category.equals(TEXT[i])) {
+				index = i;
+				break;
 			}
-			return "未被分类的，或mod自定义稀有度的特殊遗物。";
 		}
-		switch (category) {
-		case "Boss":
-			return "Relics found only within Boss chests.";
-		case "Common":
-			return "Weak relics that are found commonly.";
-		case "Rare":
-			return "Unique and powerful relics which are rarely seen.";
-		case "Shop":
-			return "Relics which can only be purchased from the Merchant.";
-		case "Event":
-			return "Relics which can only be obtained through events.";
-		case "Starter":
-			return "Characters can start with these relics.";
-		case "Uncommon":
-			return "Stronger relics which appear less often than common relics.";
-		case "Filtered":
-			return "Relics you filtered.";
+		switch (index) {
+		case 1:
+			return TEXT[10];
+		case 2:
+			return TEXT[11];
+		case 4:
+			return TEXT[12];
+		case 5:
+			return TEXT[13];
+		case 6:
+			return TEXT[14];
+		case 7:
+			return TEXT[15];
+		case 8:
+			return TEXT[16];
+		case 0:
+			return TEXT[17];
+		case 3:
+		default:
+			return TEXT[18];
 		}
-		return "Relics that are uncategorized, or belong to rarity from mods.";
 	}
 }

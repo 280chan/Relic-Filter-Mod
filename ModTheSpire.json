@@ -3,5 +3,5 @@
 	"name": "Relic Filter Mod",
 	"author_list": ["彼君不触"],
 	"description": "遗物筛选，将任意遗物从遗物池中筛选出去。\nYou can choose any relic (including mod relics) to filter out from relic pool.",
-	"version": "1.0.0"
+	"version": "1.0.1"
 }

@@ -6,16 +6,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.GameCursor;
 import com.megacrit.cardcrawl.core.Settings;
-import com.megacrit.cardcrawl.core.Settings.GameLanguage;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
+import com.megacrit.cardcrawl.localization.UIStrings;
 import com.megacrit.cardcrawl.map.MapRoomNode;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
 import com.megacrit.cardcrawl.screens.DungeonMapScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen;
+import com.megacrit.cardcrawl.screens.mainMenu.MainMenuScreen.CurScreen;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
 import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
 import com.megacrit.cardcrawl.ui.buttons.ConfirmButton;
@@ -30,7 +31,7 @@ import java.util.Iterator;
 
 /**
  * @author 彼君不触
- * @version 11/30/2020
+ * @version 1/29/2021
  * @since 8/29/2018
  */
 public abstract class RelicSelectScreen implements RenderSubscriber, PreUpdateSubscriber, ScrollBarListener {
@@ -71,6 +72,11 @@ public abstract class RelicSelectScreen implements RenderSubscriber, PreUpdateSu
 	private boolean anyNum = false;
 	private ArrayList<String> category = new ArrayList<String>();
 	private ArrayList<ArrayList<AbstractRelic>> sortedRelics = new ArrayList<ArrayList<AbstractRelic>>();
+	private CurScreen preScreen;
+	
+	private static final String UIID = "RelicSelectScreen";
+	private static final UIStrings strings = RelicFilterMod.getStrings(UIID);
+	private static final String[] TEXT = strings.TEXT;
 	
 	/**
 	 * 被选中的遗物 The relics selected
@@ -196,10 +202,7 @@ public abstract class RelicSelectScreen implements RenderSubscriber, PreUpdateSu
 	 */
 	public RelicSelectScreen(Collection<? extends AbstractRelic> c, boolean canSkip, String bDesc, String title, String desc, boolean autoSort, int amountToSelect, boolean anyNum) {
 		this.scrollBar = new ScrollBar(this);
-		if (Settings.language == GameLanguage.ZHS)
-			this.button = new ConfirmButton("保存");
-		else
-			this.button = new ConfirmButton("Save");
+		this.button = new ConfirmButton(TEXT[0]);
 		this.button.isDisabled = !canSkip;
 		this.setDescription(bDesc, title, desc);
 		if (c != null)
@@ -244,6 +247,7 @@ public abstract class RelicSelectScreen implements RenderSubscriber, PreUpdateSu
 			this.sort();
 		this.button.show();
 		this.scrollY = (Settings.HEIGHT - 400.0F * Settings.scale);
+		this.preScreen = CardCrawlGame.mainMenuScreen.screen;
 		CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.NONE;
 	}
 
@@ -334,7 +338,8 @@ public abstract class RelicSelectScreen implements RenderSubscriber, PreUpdateSu
 		if (!this.button.isDisabled) {
 			this.button.update();
 			if ((this.button.hb.clicked) || (InputHelper.pressedEscape)) {
-				CardCrawlGame.mainMenuScreen.screen = MainMenuScreen.CurScreen.NONE;
+				CardCrawlGame.mainMenuScreen.screen = this.preScreen;
+				this.preScreen = null;
 				screen = null;
 				InputHelper.pressedEscape = false;
 				this.button.hide();
